@@ -44,7 +44,7 @@ public class Mp4Analyzer implements FileAnalyzer {
     if (HEADERS_WITH_SUBBOXES.contains(box.getType())) {
       analyzeMp4(fis, box.getSubBoxes(), payloadDataSize);
     } else {
-      fis.skip(payloadDataSize);
+      fis.skipNBytes(payloadDataSize);
     }
     parentBoxAreaToScan -= box.getSize();
     if(parentBoxAreaToScan>0) {

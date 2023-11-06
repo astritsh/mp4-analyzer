@@ -7,15 +7,19 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
 @JsonInclude(Include.NON_EMPTY)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Box {
-  
-  String type;
-  int size;
-  List<Box> subBoxes;
+
+  private String type;
+  private int size;
+  private List<Box> subBoxes;
 
   public static Box create(byte[] header) {
     ByteBuffer byteBuffer = ByteBuffer.wrap(header);

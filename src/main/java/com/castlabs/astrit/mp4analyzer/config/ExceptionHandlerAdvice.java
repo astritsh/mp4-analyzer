@@ -8,6 +8,7 @@ import lombok.Value;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,6 +29,11 @@ public class ExceptionHandlerAdvice {
     return createResponse(fieldErrors, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler({ErrorResponseException.class})
+  public ResponseEntity<ErrorResponse> errorResponseException(ErrorResponseException invalidSignature) {
+    return createResponse(invalidSignature.getMessage(), HttpStatus.valueOf(invalidSignature.getStatusCode().value()));
+  }  
+  
   @ExceptionHandler({Exception.class})
   public ResponseEntity<ErrorResponse> exception(RuntimeException invalidSignature) {
     return createResponse(invalidSignature.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
