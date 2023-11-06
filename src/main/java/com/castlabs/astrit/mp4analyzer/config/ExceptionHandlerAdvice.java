@@ -47,7 +47,6 @@ public class ExceptionHandlerAdvice {
 
   @Value
   private static class ErrorResponse {
-
     int code;
     String status;
     String message;
