@@ -4,6 +4,7 @@ import static com.castlabs.astrit.mp4analyzer.domain.Box.HEADER_SIZE;
 
 import com.castlabs.astrit.mp4analyzer.domain.Box;
 import com.castlabs.astrit.mp4analyzer.exceptions.FileException;
+import com.castlabs.astrit.mp4analyzer.util.BoundedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ public class Mp4Analyzer implements FileAnalyzer {
 
   @Override
   public List<Box> analyze(InputStream inputStream, String videoUrl){
-    try (inputStream) {
+    try (var boundedInputStream = new BoundedInputStream(inputStream, inputStream.available())) {
       List<Box> boxes = new ArrayList<>();
-      analyzeMp4(inputStream, boxes, Integer.MAX_VALUE);
+      analyzeMp4(boundedInputStream, boxes);
       return boxes;
     } catch (Exception e) {
       log.error("An error occurred while analyzing the mp4 file: {}",videoUrl, e);
@@ -34,9 +35,9 @@ public class Mp4Analyzer implements FileAnalyzer {
     }
   }
   
-  private static void analyzeMp4(InputStream fis, List<Box> boxes, int parentBoxAreaToScan) throws IOException {
+  private static void analyzeMp4(BoundedInputStream inputStream, List<Box> boxes) throws IOException {
     byte[] header = new byte[HEADER_SIZE];
-    boolean noBytesToRead = fis.read(header) == -1;
+    boolean noBytesToRead = inputStream.read(header) == -1;
     if (noBytesToRead) {
       return;
     }
@@ -45,13 +46,12 @@ public class Mp4Analyzer implements FileAnalyzer {
     boxes.add(box);
     int payloadDataSize = box.getPayloadDataSize();
     if (HEADERS_WITH_SUBBOXES.contains(box.getType())) {
-      analyzeMp4(fis, box.getSubBoxes(), payloadDataSize);
-    } else {
-      fis.skipNBytes(payloadDataSize);
+      var boxInputStream = new BoundedInputStream(inputStream, payloadDataSize);
+      analyzeMp4(boxInputStream, box.getSubBoxes());
     }
-    parentBoxAreaToScan -= box.getSize();
-    if(parentBoxAreaToScan > 0) {
-      analyzeMp4(fis, boxes, parentBoxAreaToScan);
+    else {
+      inputStream.skipNBytes(payloadDataSize);
     }
+    analyzeMp4(inputStream, boxes);
   }
 }
