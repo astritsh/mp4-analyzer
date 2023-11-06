@@ -17,22 +17,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Box {
 
+  public static final int HEADER_SIZE = 8;
   private String type;
   private int size;
   private List<Box> subBoxes;
 
-  public static Box create(byte[] header) {
-    ByteBuffer byteBuffer = ByteBuffer.wrap(header);
-    int size = byteBuffer.getInt();
+  public static Box create(byte[] byteArrayHeader) {
+    if(byteArrayHeader.length != HEADER_SIZE){
+      throw new IllegalArgumentException("Header size must be " + HEADER_SIZE);
+    }
+    ByteBuffer header = ByteBuffer.wrap(byteArrayHeader);
+    int size = header.getInt();
     byte[] typeBytes = new byte[4];
-    byteBuffer.get(typeBytes);
+    header.get(typeBytes);
     String type = new String(typeBytes, StandardCharsets.UTF_8);
     return new Box(type, size, new ArrayList<>());
   }
 
   @JsonIgnore
   public int getPayloadDataSize() {
-    return this.size - 8;
+    return this.size - HEADER_SIZE;
   }
     
 }

@@ -1,5 +1,7 @@
 package com.castlabs.astrit.mp4analyzer.service.analyzer;
 
+import static com.castlabs.astrit.mp4analyzer.domain.Box.HEADER_SIZE;
+
 import com.castlabs.astrit.mp4analyzer.domain.Box;
 import com.castlabs.astrit.mp4analyzer.exceptions.FileException;
 import java.io.IOException;
@@ -33,8 +35,9 @@ public class Mp4Analyzer implements FileAnalyzer {
   }
   
   private static void analyzeMp4(InputStream fis, List<Box> boxes, int parentBoxAreaToScan) throws IOException {
-    byte[] header = new byte[8];
-    if (fis.read(header) == -1) {
+    byte[] header = new byte[HEADER_SIZE];
+    boolean noBytesToRead = fis.read(header) == -1;
+    if (noBytesToRead) {
       return;
     }
 
@@ -47,7 +50,7 @@ public class Mp4Analyzer implements FileAnalyzer {
       fis.skipNBytes(payloadDataSize);
     }
     parentBoxAreaToScan -= box.getSize();
-    if(parentBoxAreaToScan>0) {
+    if(parentBoxAreaToScan > 0) {
       analyzeMp4(fis, boxes, parentBoxAreaToScan);
     }
   }
