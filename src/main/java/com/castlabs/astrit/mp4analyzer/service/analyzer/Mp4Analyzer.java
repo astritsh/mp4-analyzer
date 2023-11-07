@@ -4,7 +4,6 @@ import static com.castlabs.astrit.mp4analyzer.domain.Box.HEADER_SIZE;
 
 import com.castlabs.astrit.mp4analyzer.domain.Box;
 import com.castlabs.astrit.mp4analyzer.exceptions.FileException;
-import com.castlabs.astrit.mp4analyzer.util.BoundedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +25,7 @@ public class Mp4Analyzer implements FileAnalyzer {
 
   @Override
   public List<Box> analyze(InputStream inputStream, String videoUrl){
-    try (var boundedInputStream = new BoundedInputStream(inputStream, inputStream.available())) {
+    try (var boundedInputStream = new BoundedInputStream(inputStream)) {
       List<Box> boxes = new ArrayList<>();
       analyzeMp4(boundedInputStream, boxes);
       return boxes;
@@ -37,8 +37,8 @@ public class Mp4Analyzer implements FileAnalyzer {
   
   private static void analyzeMp4(BoundedInputStream inputStream, List<Box> boxes) throws IOException {
     byte[] header = new byte[HEADER_SIZE];
-    boolean noBytesToRead = inputStream.read(header) == -1;
-    if (noBytesToRead) {
+    boolean noBytesAvailable = inputStream.read(header) == -1;
+    if (noBytesAvailable) {
       return;
     }
 
