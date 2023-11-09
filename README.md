@@ -46,16 +46,16 @@ http://localhost:8080/api/v1/analyze-mp4?videoUrl=http://demo.castlabs.com/tmp/t
 ```
 #### Running using curl
 ```
-curl -G -d "videoUrl={your-url} http://localhost:8080/api/v1/analyze-mp4 
+curl -G -d "videoUrl={your-url}" http://localhost:8080/api/v1/analyze-mp4 
 ```
 Example:
 ```
-curl -G -d "videoUrl=http://demo.castlabs.com/tmp/text0.mp4 http://localhost:8080/api/v1/analyze-mp4 
+curl -G -d "videoUrl=http://demo.castlabs.com/tmp/text0.mp4" http://localhost:8080/api/v1/analyze-mp4 
 ```
 
 Format the `curl` JSON response by installing `json` (`npm i -g json`)
 ```
-curl -G -d "videoUrl=http://demo.castlabs.com/tmp/text0.mp4 http://localhost:8080/api/v1/analyze-mp4 | json 
+curl -G -d "videoUrl=http://demo.castlabs.com/tmp/text0.mp4" http://localhost:8080/api/v1/analyze-mp4 | json 
 ```
 
 ## Run Tests
